@@ -14,8 +14,8 @@ function App() {
   const [email, setEmail] = React.useState<string>('');
   const [employer, setEmployer] = React.useState<string>('');
   const [annualIncome, setAnnualIncome] = React.useState<string>('');
-  // const [requestedCreditAmount, setRequestedCreditAmount] = React.useState<string>('');
-  // const [additionalInformation, setAdditionalInformation] = React.useState<string>('');
+  const [requestedCreditAmount, setRequestedCreditAmount] = React.useState<string>('');
+  const [additionalInformation, setAdditionalInformation] = React.useState<string>('');
 
   function handleFirstname(value: string) {
     setFirstname(value);
@@ -30,7 +30,30 @@ function App() {
   }
 
   function handlePhoneNumber(value: string) {
-    setPhoneNumber(value);
+    // Remove all non-digit characters so we can only parse the numbers
+    const numericValue = value.replace(/\D/g, '');
+
+    let formattedNumber = '';
+
+    if (numericValue.length > 0) {
+      // If the length is 3 or less, just add the digits
+      if (numericValue.length <= 3) {
+        formattedNumber = numericValue;
+      }
+      // If the length is between 4 and 7, format as XXX-XXX
+      else if (numericValue.length <= 6) {
+        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3)}`;
+      }
+      // If the length is greater than 7, format as XXX-XXX-XXXX
+      else {
+        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3, 6)}-${numericValue.substring(
+          6,
+          10
+        )}`;
+      }
+    }
+
+    setPhoneNumber(formattedNumber);
   }
 
   function handleEmail(value: string) {
@@ -45,8 +68,28 @@ function App() {
     setAnnualIncome(value);
   }
 
+  function handleRequestedCreditAmount(value: string) {
+    setRequestedCreditAmount(value);
+  }
+
+  function handleadditionalInformation(value: string) {
+    setAdditionalInformation(value);
+  }
+
   function handleSubmit() {
-    //alert(firstname);
+    const payload = {
+      firstname,
+      lastname,
+      address,
+      phoneNumber,
+      email,
+      employer,
+      annualIncome,
+      requestedCreditAmount,
+      additionalInformation,
+    };
+
+    console.log(payload);
 
     const promise = (): Promise<{ name: string }> =>
       new Promise((resolve) => setTimeout(() => resolve({ name: 'Sonner' }), 2000));
@@ -150,12 +193,24 @@ function App() {
             </div>
             <div className='space-y-2'>
               <Label htmlFor='credit-amount'>Requested Credit Amount</Label>
-              <Input id='credit-amount' type='number' placeholder='$5,000' required />
+              <Input
+                id='credit-amount'
+                type='number'
+                placeholder='$5,000'
+                value={requestedCreditAmount}
+                onChange={(e) => handleRequestedCreditAmount(e.target.value)}
+                required
+              />
             </div>
           </div>
           <div className='space-y-2'>
             <Label htmlFor='comments'>Additional Information</Label>
-            <Textarea id='comments' placeholder='Please provide any additional information or comments.' />
+            <Textarea
+              id='comments'
+              placeholder='Please provide any additional information or comments.'
+              value={additionalInformation}
+              onChange={(e) => handleadditionalInformation(e.target.value)}
+            />
           </div>
           <div className='space-y-2'>
             <Label>Supporting Documents</Label>
