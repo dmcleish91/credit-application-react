@@ -17,6 +17,7 @@ function App() {
   const [annualIncome, setAnnualIncome] = React.useState<string>('');
   const [requestedCreditAmount, setRequestedCreditAmount] = React.useState<string>('');
   const [additionalInformation, setAdditionalInformation] = React.useState<string>('');
+  const [selectedFile, setSelectedFile] = React.useState<File | undefined>(undefined);
 
   function handleFirstname(value: string) {
     setFirstname(value);
@@ -77,6 +78,12 @@ function App() {
     setAdditionalInformation(value);
   }
 
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.files) {
+      setSelectedFile(event.target.files[0]);
+    }
+  }
+
   function handleSubmit() {
     const payload = {
       uuid: crypto.randomUUID(),
@@ -93,17 +100,44 @@ function App() {
 
     console.log(payload);
 
-    const postRequest = (url: string, data: typeof payload): Promise<AxiosResponse> => {
-      return new Promise((resolve, reject) => {
-        axios
-          .post(url, data, {
+    const postRequest = (url: string, data: typeof payload, file?: File): Promise<AxiosResponse[]> => {
+      const postJsonData = axios.post(url + '/newcredit', data, {
+        headers: {
+          Authorization: 'Basic YWRtaW46c2VjcmV0',
+        },
+      });
+
+      const postFileData = (): Promise<AxiosResponse> => {
+        if (file) {
+          const fileData = new FormData();
+          fileData.append('uuid', payload.uuid);
+          fileData.append('file', file);
+
+          return axios.post(url + '/uploadPDF', fileData, {
             headers: {
               Authorization: 'Basic YWRtaW46c2VjcmV0',
+              'Content-Type': 'multipart/form-data',
             },
-          })
-          .then((response: AxiosResponse) => {
-            console.log(response);
-            resolve(response);
+          });
+        } else {
+          return Promise.resolve({} as AxiosResponse);
+        }
+      };
+
+      return new Promise((resolve, reject) => {
+        postJsonData
+          .then((jsonResponse) => {
+            if (file) {
+              postFileData()
+                .then((fileResponse) => {
+                  resolve([jsonResponse, fileResponse]);
+                })
+                .catch((error) => {
+                  reject(error);
+                });
+            } else {
+              resolve([jsonResponse]);
+            }
           })
           .catch((error) => {
             reject(error);
@@ -111,10 +145,7 @@ function App() {
       });
     };
 
-    // const promise = (): Promise<{ name: string }> =>
-    //   new Promise((resolve) => setTimeout(() => resolve({ name: 'Sonner' }), 2000));
-
-    toast.promise(postRequest(import.meta.env.VITE_API_URL + '/newcredit', payload), {
+    toast.promise(postRequest(import.meta.env.VITE_API_URL, payload, selectedFile), {
       loading: 'Submitting Application...',
       success: () => {
         return `Thanks for your submission`;
@@ -235,7 +266,7 @@ function App() {
           <div className='space-y-2'>
             <Label>Supporting Documents</Label>
             <div className='flex items-center space-x-2'>
-              <Input type='file' id='document1' />
+              <Input type='file' id='document1' onChange={(e) => handleFileChange(e)} />
               <Label htmlFor='document1' className='cursor-pointer'>
                 <UploadIcon className='w-5 h-5' />
                 <span className='sr-only'>Upload document</span>
