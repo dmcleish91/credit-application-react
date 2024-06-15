@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 import { toast } from 'sonner';
+import axios, { AxiosResponse } from 'axios';
 
 function App() {
   const [firstname, setFirstname] = React.useState<string>('');
@@ -46,10 +47,7 @@ function App() {
       }
       // If the length is greater than 7, format as XXX-XXX-XXXX
       else {
-        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3, 6)}-${numericValue.substring(
-          6,
-          10
-        )}`;
+        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3, 6)}-${numericValue.substring(6, 10)}`;
       }
     }
 
@@ -91,8 +89,21 @@ function App() {
 
     console.log(payload);
 
-    const promise = (): Promise<{ name: string }> =>
-      new Promise((resolve) => setTimeout(() => resolve({ name: 'Sonner' }), 2000));
+    const postRequest = (url: string, data: typeof payload): Promise<AxiosResponse> => {
+      return new Promise((resolve, reject) => {
+        axios
+          .post(url, data)
+          .then((response: AxiosResponse) => {
+            console.log(response);
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    };
+
+    const promise = (): Promise<{ name: string }> => new Promise((resolve) => setTimeout(() => resolve({ name: 'Sonner' }), 2000));
 
     toast.promise(promise, {
       loading: 'Submitting Application...',
@@ -114,23 +125,11 @@ function App() {
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='first-name'>First Name</Label>
-              <Input
-                id='first-name'
-                placeholder='John'
-                value={firstname}
-                onChange={(e) => handleFirstname(e.target.value)}
-                required
-              />
+              <Input id='first-name' placeholder='John' value={firstname} onChange={(e) => handleFirstname(e.target.value)} required />
             </div>
             <div className='space-y-2'>
               <Label htmlFor='last-name'>Last Name</Label>
-              <Input
-                id='last-name'
-                placeholder='Doe'
-                value={lastname}
-                onChange={(e) => handleLastname(e.target.value)}
-                required
-              />
+              <Input id='last-name' placeholder='Doe' value={lastname} onChange={(e) => handleLastname(e.target.value)} required />
             </div>
           </div>
           <div className='grid grid-cols-2 gap-4'>
@@ -170,13 +169,7 @@ function App() {
             </div>
             <div className='space-y-2'>
               <Label htmlFor='employer'>Employer</Label>
-              <Input
-                id='employer'
-                placeholder='Acme Inc.'
-                value={employer}
-                onChange={(e) => handleEmployer(e.target.value)}
-                required
-              />
+              <Input id='employer' placeholder='Acme Inc.' value={employer} onChange={(e) => handleEmployer(e.target.value)} required />
             </div>
           </div>
           <div className='grid grid-cols-2 gap-4'>
