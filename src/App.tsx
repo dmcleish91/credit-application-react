@@ -47,7 +47,10 @@ function App() {
       }
       // If the length is greater than 7, format as XXX-XXX-XXXX
       else {
-        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3, 6)}-${numericValue.substring(6, 10)}`;
+        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3, 6)}-${numericValue.substring(
+          6,
+          10
+        )}`;
       }
     }
 
@@ -76,14 +79,15 @@ function App() {
 
   function handleSubmit() {
     const payload = {
+      uuid: crypto.randomUUID(),
       firstname,
       lastname,
       address,
       phoneNumber,
       email,
       employer,
-      annualIncome,
-      requestedCreditAmount,
+      annualIncome: Number(annualIncome),
+      requestedCreditAmount: Number(requestedCreditAmount),
       additionalInformation,
     };
 
@@ -92,7 +96,11 @@ function App() {
     const postRequest = (url: string, data: typeof payload): Promise<AxiosResponse> => {
       return new Promise((resolve, reject) => {
         axios
-          .post(url, data)
+          .post(url, data, {
+            headers: {
+              Authorization: 'Basic YWRtaW46c2VjcmV0',
+            },
+          })
           .then((response: AxiosResponse) => {
             console.log(response);
             resolve(response);
@@ -103,12 +111,13 @@ function App() {
       });
     };
 
-    const promise = (): Promise<{ name: string }> => new Promise((resolve) => setTimeout(() => resolve({ name: 'Sonner' }), 2000));
+    // const promise = (): Promise<{ name: string }> =>
+    //   new Promise((resolve) => setTimeout(() => resolve({ name: 'Sonner' }), 2000));
 
-    toast.promise(promise, {
+    toast.promise(postRequest(import.meta.env.VITE_API_URL + '/newcredit', payload), {
       loading: 'Submitting Application...',
-      success: (data) => {
-        return `Thanks ${data.name} your application has been submitted sucessfully`;
+      success: () => {
+        return `Thanks for your submission`;
       },
       error: 'Error',
     });
@@ -125,11 +134,23 @@ function App() {
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='first-name'>First Name</Label>
-              <Input id='first-name' placeholder='John' value={firstname} onChange={(e) => handleFirstname(e.target.value)} required />
+              <Input
+                id='first-name'
+                placeholder='John'
+                value={firstname}
+                onChange={(e) => handleFirstname(e.target.value)}
+                required
+              />
             </div>
             <div className='space-y-2'>
               <Label htmlFor='last-name'>Last Name</Label>
-              <Input id='last-name' placeholder='Doe' value={lastname} onChange={(e) => handleLastname(e.target.value)} required />
+              <Input
+                id='last-name'
+                placeholder='Doe'
+                value={lastname}
+                onChange={(e) => handleLastname(e.target.value)}
+                required
+              />
             </div>
           </div>
           <div className='grid grid-cols-2 gap-4'>
@@ -169,7 +190,13 @@ function App() {
             </div>
             <div className='space-y-2'>
               <Label htmlFor='employer'>Employer</Label>
-              <Input id='employer' placeholder='Acme Inc.' value={employer} onChange={(e) => handleEmployer(e.target.value)} required />
+              <Input
+                id='employer'
+                placeholder='Acme Inc.'
+                value={employer}
+                onChange={(e) => handleEmployer(e.target.value)}
+                required
+              />
             </div>
           </div>
           <div className='grid grid-cols-2 gap-4'>
