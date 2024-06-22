@@ -48,10 +48,7 @@ function App() {
       }
       // If the length is greater than 7, format as XXX-XXX-XXXX
       else {
-        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3, 6)}-${numericValue.substring(
-          6,
-          10
-        )}`;
+        formattedNumber = `${numericValue.substring(0, 3)}-${numericValue.substring(3, 6)}-${numericValue.substring(6, 10)}`;
       }
     }
 
@@ -97,8 +94,6 @@ function App() {
       requestedCreditAmount: Number(requestedCreditAmount),
       additionalInformation,
     };
-
-    console.log(payload);
 
     const postRequest = (url: string, data: typeof payload, file?: File): Promise<AxiosResponse[]> => {
       const postJsonData = axios.post(url + '/newcredit', data, {
@@ -165,23 +160,11 @@ function App() {
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='first-name'>First Name</Label>
-              <Input
-                id='first-name'
-                placeholder='John'
-                value={firstname}
-                onChange={(e) => handleFirstname(e.target.value)}
-                required
-              />
+              <Input id='first-name' placeholder='John' value={firstname} onChange={(e) => handleFirstname(e.target.value)} required />
             </div>
             <div className='space-y-2'>
               <Label htmlFor='last-name'>Last Name</Label>
-              <Input
-                id='last-name'
-                placeholder='Doe'
-                value={lastname}
-                onChange={(e) => handleLastname(e.target.value)}
-                required
-              />
+              <Input id='last-name' placeholder='Doe' value={lastname} onChange={(e) => handleLastname(e.target.value)} required />
             </div>
           </div>
           <div className='grid grid-cols-2 gap-4'>
@@ -221,13 +204,7 @@ function App() {
             </div>
             <div className='space-y-2'>
               <Label htmlFor='employer'>Employer</Label>
-              <Input
-                id='employer'
-                placeholder='Acme Inc.'
-                value={employer}
-                onChange={(e) => handleEmployer(e.target.value)}
-                required
-              />
+              <Input id='employer' placeholder='Acme Inc.' value={employer} onChange={(e) => handleEmployer(e.target.value)} required />
             </div>
           </div>
           <div className='grid grid-cols-2 gap-4'>
